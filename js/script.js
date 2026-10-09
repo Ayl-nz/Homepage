@@ -36,11 +36,26 @@
     return chosen;
   }
 
+  /* ---------- 预加载其余壁纸 ---------- */
+  /* 首屏完成后延迟 2 秒开始，每隔 1.5 秒加载一张，避免抢占带宽 */
+  function preloadRest(){
+    var others = WALLPAPERS.filter(function(w){ return w.src !== item.src; });
+    others.forEach(function(w, i){
+      setTimeout(function(){
+        var pre = new Image();
+        pre.src = w.src;
+      }, i * 1500);
+    });
+  }
+
   item = pick();
   var loader = new Image();
   loader.onload = function(){
     document.getElementById('wallpaper').style.backgroundImage = 'url("' + item.src + '")';
     applyPosition();
+
+    /* 首屏稳定后再偷偷预加载其他图 */
+    setTimeout(preloadRest, 2000);
   };
   loader.src = item.src;
 
